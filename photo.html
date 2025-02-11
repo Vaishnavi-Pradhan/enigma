@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webcam Capture</title>
+  <style>
+    video, canvas {
+      display: block;
+      margin: 10px auto;
+      border: 2px solid #000;
+    }
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Capture Webcam Images</h1>
+  <video id="video" autoplay muted></video>
+  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+  <button id="start">Start Capture</button>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const startButton = document.getElementById('start');
+
+    // Function to start webcam
+    async function startWebcam() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+      } catch (err) {
+        console.error('Error accessing the webcam:', err);
+      }
+    }
+
+    // Capture images over 10 seconds
+    startButton.addEventListener('click', async () => {
+      const totalImages = 20;
+      const interval = 10000 / totalImages; // Interval between captures
+      let imageCount = 0;
+
+      const images = [];
+
+      const captureInterval = setInterval(() => {
+        if (imageCount >= totalImages) {
+          clearInterval(captureInterval);
+          alert('Capture complete! Images are saved.');
+          return;
+        }
+
+        // Draw the current video frame onto the canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Get the image data as a Blob and store it
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const url = URL.createObjectURL(blob);
+
+            // Download the image automatically
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `image_${imageCount + 1}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }
+        });
+
+        imageCount++;
+      }, interval);
+    });
+
+    // Start webcam on page load
+    startWebcam();
+  </script>
+</body>
+</html>

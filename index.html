@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            max-width: 80%;
+        }
+        .register-box {
+            text-align: center;
+        }
+        .register-title {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #4caf50;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #388e3c;
+        }
+        .login-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="register-box">
+            <h2 class="register-title">Register</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter Username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter Password" required>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn" onclick="register()">Register</button>
+                </div>
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include Supabase library and bcrypt -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script>
+        // Define Supabase URL and Key
+        const SUPABASE_URL = "https://tiuymqyefsibucaxxxri.supabase.co"; // Replace with your Supabase project URL
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpdXltcXllZnNpYnVjYXh4eHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgwNTg1OTYsImV4cCI6MjA1MzYzNDU5Nn0.MRTDQeeSit2VF7Tsw3PWtyou64aovJLSl3EF6XSEAjE"; // Replace with your Supabase key
+
+        // Initialize Supabase client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function register() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            if (!username || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                // Check if the username already exists
+                const { data: existingUser, error: userCheckError } = await supabase
+                    .from("login")
+                    .select("*")
+                    .eq("username", username)
+                    .single();
+
+                if (existingUser) {
+                    alert("Username already exists. Please choose a different username.");
+                    return;
+                }
+
+                // Hash the password using bcrypt
+                const hashedPassword = bcrypt.hashSync(password, 10);
+
+                // Insert the new user into the database
+                const { data, error } = await supabase
+                    .from("login")
+                    .insert([{ username: username, password: hashedPassword }]);
+
+                if (error) {
+                    throw error;
+                }
+
+                alert("Registration successful! Redirecting to login page...");
+                window.location.href = "login.html"; // Redirect to the login page
+            } catch (err) {
+                console.error("Error registering:", err);
+                alert("Something went wrong. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>

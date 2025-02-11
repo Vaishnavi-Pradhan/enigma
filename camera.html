@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      background-color: #f5f5f5;
+      border-bottom: 2px solid #ddd;
+    }
+
+    #main-container {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      padding: 20px;
+    }
+
+    #question-container {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    #video-container {
+      width: 300px;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      border: 2px solid #000;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+    }
+
+    .question {
+      margin-bottom: 20px;
+    }
+
+    .question h3 {
+      margin: 0 0 10px 0;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+    }
+
+    .options li {
+      margin: 5px 0;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+    }
+
+    .submit-button {
+        margin-top: 20px;
+        display: block;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+  
+      .submit-button:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+      }
+  
+      .submit-button:active {
+        background-color: #3e8e41;
+        transform: scale(0.95);
+      }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Test</h1>
+  </header>
+  
+  <div id="main-container">
+    <div id="question-container">
+      <!-- MCQs Section -->
+      <div class="question">
+        <h3>1. What is the capital of France?</h3>
+        <ul class="options">
+          <li><input type="radio" name="q1" id="q1a" value="Paris"> <label for="q1a">Paris</label></li>
+          <li><input type="radio" name="q1" id="q1b" value="London"> <label for="q1b">London</label></li>
+          <li><input type="radio" name="q1" id="q1c" value="Berlin"> <label for="q1c">Berlin</label></li>
+          <li><input type="radio" name="q1" id="q1d" value="Madrid"> <label for="q1d">Madrid</label></li>
+        </ul>
+      </div>
+
+      <div class="question">
+        <h3>2. Which programming language is used for web development?</h3>
+        <ul class="options">
+          <li><input type="radio" name="q2" id="q2a" value="Python"> <label for="q2a">Python</label></li>
+          <li><input type="radio" name="q2" id="q2b" value="JavaScript"> <label for="q2b">JavaScript</label></li>
+          <li><input type="radio" name="q2" id="q2c" value="C++"> <label for="q2c">C++</label></li>
+          <li><input type="radio" name="q2" id="q2d" value="Java"> <label for="q2d">Java</label></li>
+        </ul>
+      </div>
+
+      <div class="question">
+        <h3>3. Which planet is known as the Red Planet?</h3>
+        <ul class="options">
+          <li><input type="radio" name="q3" id="q3a" value="Earth"> <label for="q3a">Earth</label></li>
+          <li><input type="radio" name="q3" id="q3b" value="Mars"> <label for="q3b">Mars</label></li>
+          <li><input type="radio" name="q3" id="q3c" value="Jupiter"> <label for="q3c">Jupiter</label></li>
+          <li><input type="radio" name="q3" id="q3d" value="Saturn"> <label for="q3d">Saturn</label></li>
+        </ul>
+      </div>
+      <button class="submit-button" onclick="submitAnswers()">Submit</button>
+    </div>
+
+    <div id="video-container">
+      <!-- Webcam Stream -->
+      <video id="video" autoplay></video>
+      <p id="status">Gaze Status: Analyzing...</p>
+    </div>
+  </div>
+
+  <script>
+    const videoElement = document.getElementById('video');
+    const statusElement = document.getElementById('status');
+
+    // Initialize MediaPipe FaceMesh
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+    });
+    faceMesh.setOptions({
+      maxNumFaces: 2, // Only detect one face
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    // Start the webcam
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await faceMesh.send({ image: videoElement });
+      },
+      width: 640,
+      height: 480,
+    });
+    camera.start();
+
+    // Calculate gaze direction
+    function calculateGazeDirection(landmarks) {
+      const leftEyeInner = landmarks[133]; // Inner corner of the left eye
+      const leftEyeOuter = landmarks[33];  // Outer corner of the left eye
+      const rightEyeInner = landmarks[362]; // Inner corner of the right eye
+      const rightEyeOuter = landmarks[263]; // Outer corner of the right eye
+      const noseTip = landmarks[1]; // Nose tip landmark
+
+      // Calculate the midpoint of the eyes
+      const leftEyeMidpoint = {
+        x: (leftEyeInner.x + leftEyeOuter.x) / 2,
+        y: (leftEyeInner.y + leftEyeOuter.y) / 2,
+      };
+      const rightEyeMidpoint = {
+        x: (rightEyeInner.x + rightEyeOuter.x) / 2,
+        y: (rightEyeInner.y + rightEyeOuter.y) / 2,
+      };
+
+      // Calculate gaze direction by comparing eye midpoints to the nose tip
+      const gazeVector = {
+        x: ((leftEyeMidpoint.x + rightEyeMidpoint.x) / 2) - noseTip.x,
+        y: ((leftEyeMidpoint.y + rightEyeMidpoint.y) / 2) - noseTip.y,
+      };
+
+      if (gazeVector.x < -0.03) {
+        return 'Looking Left';
+      } else if (gazeVector.x > 0.03) {
+        return 'Looking Right';
+      } else {
+        return 'Looking Straight';
+      }
+    }
+
+    // Process the landmarks
+    faceMesh.onResults((results) => {
+        if (results.multiFaceLandmarks) {
+          if (results.multiFaceLandmarks.length > 1) {
+            // Alert and update status if more than one face is detected
+            alert('Multiple faces detected! Test will terminate.');
+            window.location.href = "login.html";
+            statusElement.textContent = 'Gaze Status: Multiple Faces Detected!';
+            return;
+          }
+  
+          for (const landmarks of results.multiFaceLandmarks) {
+            // Detect gaze direction
+          const gazeDirection = calculateGazeDirection(landmarks);
+          statusElement.textContent = `Gaze Status: ${gazeDirection}`;
+          }
+        } else {
+          statusElement.textContent = 'Gaze Status: No Face Detected';
+        }
+      });
+
+      let awayTimer;
+        const maxAwayTime = 3000; // 3 seconds in milliseconds
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
+                // Start the timer when the tab is hidden
+                awayTimer = setTimeout(() => {
+                    alert("You have changed the tab or minimized the window. Logging you out...");
+                    window.location.href = "login.html"; // Replace with your logout page
+                }, maxAwayTime);
+            } else if (document.visibilityState === "visible") {
+                // Clear the timer when the tab is visible again
+                clearTimeout(awayTimer);
+            }
+        });
+
+  </script>
+</body>
+</html>

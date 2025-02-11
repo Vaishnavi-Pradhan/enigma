@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            max-width: 80%;
+        }
+        .login-box {
+            text-align: center;
+        }
+        .login-title {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #4caf50;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #388e3c;
+        }
+        .signup-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h2 class="login-title">Login</h2>
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-input" placeholder="Enter Username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter Password" required>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn" onclick="login()">Start Test</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include Supabase library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <script>
+        // Define Supabase URL and Key
+        const SUPABASE_URL = "https://tiuymqyefsibucaxxxri.supabase.co"; // Replace with your Supabase project URL
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRpdXltcXllZnNpYnVjYXh4eHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgwNTg1OTYsImV4cCI6MjA1MzYzNDU5Nn0.MRTDQeeSit2VF7Tsw3PWtyou64aovJLSl3EF6XSEAjE"; // Replace with your Supabase key
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            if (!username || !password) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                // Fetch user data from Supabase
+                const { data, error } = await supabase
+                    .from("login")
+                    .select("password")
+                    .eq("username", username)
+                    .single();
+
+                if (error || !data) {
+                    alert("Invalid username or password.");
+                    return;
+                }
+
+                // Compare plain-text passwords
+                if (password === data.password) {
+                    alert("Login successful!");
+                    window.location.href = "camera.html"; // Redirect to your desired page
+                } else {
+                    alert("Invalid username or password.");
+                }
+            } catch (err) {
+                console.error("Error logging in:", err);
+                alert("Something went wrong. Please try again.");
+            }
+        }
+    </script>
+</body>
+</html>
