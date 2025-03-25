@@ -1,0 +1,43 @@
+export const lightTheme = {
+  background: '#f8f9fa',
+  text: '#212529',
+  headerBg: '#ffffff',
+  cardBg: '#ffffff',
+  border: '#e9ecef',
+  shadow: 'rgba(0, 0, 0, 0.1)',
+  hoverShadow: 'rgba(0, 0, 0, 0.15)',
+  primary: '#4CAF50',
+  primaryLight: 'rgba(76, 175, 80, 0.1)',
+  primaryDark: '#388E3C',
+  textSecondary: '#6c757d',
+  inputBorder: '#ced4da',
+  inputBg: '#ffffff',
+  focusShadow: 'rgba(76, 175, 80, 0.25)',
+  disabled: '#e9ecef',
+  buttonBg: '#f1f3f5',
+  buttonText: '#212529',
+  buttonHover: 'rgba(0, 0, 0, 0.05)',
+  hoverBg: 'rgba(0, 0, 0, 0.03)'
+};
+
+export const darkTheme = {
+  background: '#121212',
+  text: '#f8f9fa',
+  headerBg: '#1e1e1e',
+  cardBg: '#1e1e1e',
+  border: '#333',
+  shadow: 'rgba(0, 0, 0, 0.3)',
+  hoverShadow: 'rgba(0, 0, 0, 0.4)',
+  primary: '#4CAF50',
+  primaryLight: 'rgba(76, 175, 80, 0.2)',
+  primaryDark: '#388E3C',
+  textSecondary: '#adb5bd',
+  inputBorder: '#495057',
+  inputBg: '#2b2b2b',
+  focusShadow: 'rgba(76, 175, 80, 0.35)',
+  disabled: '#343a40',
+  buttonBg: '#2b2b2b',
+  buttonText: '#f8f9fa',
+  buttonHover: 'rgba(255, 255, 255, 0.1)',
+  hoverBg: 'rgba(255, 255, 255, 0.05)'
+};
