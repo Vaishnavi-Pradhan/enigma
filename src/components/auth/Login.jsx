@@ -126,7 +126,7 @@ const LoginForm = () => {
     try {
       // Check if the user exists in the 'login' table
       const { data, error: queryError } = await supabase
-        .from('login')
+        .from('users')                                             //changed login table to users table 
         .select('*')
         .eq('username', email) // Assuming you are using 'email' as username
         .eq('password', password);
