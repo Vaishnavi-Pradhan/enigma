@@ -92,12 +92,15 @@ def register():
 
     embedding = encodings[0].tolist()
     hashed_password = hash_password(password)
+    
+    # Convert list to PostgreSQL float8[] format
+    embedding_str = "{" + ",".join(map(str, embedding)) + "}"  # Ensures proper float array format
 
     # Store in Supabase
     data = {
         "username": username,
         "password": hashed_password,
-        "embedding": embedding
+        "embedding": embedding_str
     }
     supabase.table("users").insert(data).execute()
 
