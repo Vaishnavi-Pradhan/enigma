@@ -147,25 +147,6 @@ const LoginForm = () => {
     }
   };
 
-  // const handleLogin = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-    
-  //   try {
-  //     const { error } = await supabase.auth.signInWithPassword({
-  //       email,
-  //       password
-  //     });
-
-  //     if (error) throw error;
-  //     window.location.href = '/exam';
-  //   } catch (error) {
-  //     alert(error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   return (
     <LoginContainer theme={theme}>
       <LoginTitle theme={theme}>Login</LoginTitle>
