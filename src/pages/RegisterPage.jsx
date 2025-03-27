@@ -281,12 +281,20 @@ const Register = () => {
       const blob = await fetch(imageSrc).then(res => res.blob());
       const formData = new FormData();
       formData.append("image", blob, "face.jpg");
-      formData.append("email", email);
-      formData.append("password", password);
 
       // Send data to backend to process face embedding
       const response = await axios.post("http://127.0.0.1:5000/register", formData);
       if (response.data.error) throw new Error(response.data.error);
+
+      const embedding = response.data.embedding; // Receive embedding from backend
+
+      // Save user details and embedding in Supabase
+      const { error: supabaseError } = await supabase.from("users").insert({
+        username: email,
+        password: password,
+        embedding: embedding
+      });
+      if (supabaseError) throw new Error(supabaseError.message);
 
       alert('Registration successful! Please check your email for verification.');
       navigate('/login');
