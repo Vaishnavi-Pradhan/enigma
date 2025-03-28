@@ -5,6 +5,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ExamPage from './pages/ExamPage';
 import CapturePage from './pages/CapturePage';
+import Dashboard from './pages/Dashboard';
+import StartExam from './pages/StartExam';
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/exam" element={<ExamPage />} />
           <Route path="/capture" element={<CapturePage />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/startexam" element={<StartExam />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
