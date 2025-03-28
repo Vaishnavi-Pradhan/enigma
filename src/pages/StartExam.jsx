@@ -1,6 +1,6 @@
 //new
 import Webcam from 'react-webcam';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { supabase } from '../services/supabase';
@@ -63,9 +63,34 @@ const AuthButton = styled.button`
 `;
 
 const BeforeExam = () => {
-  const navigate = useNavigate();
+  const navigation = useNavigate();
   const webcamRef = useRef(null);
   const [loading, setLoading] = useState(false);
+  const userId = sessionStorage.getItem('userId');
+  const [user, setUser]= useState(null);
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (userId) {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', userId)
+          .single();
+
+        if (data) {
+          setUser({ username: data.username, name: data.name });
+        } else {
+          console.error('Error fetching user data:', error);
+          navigation('/login');
+        }
+      } else {
+        navigation('/login');
+      }
+    };
+
+    fetchUser();
+  }, [navigation, userId]);
 
   const cosineSimilarity = (vecA, vecB) => {
     const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);

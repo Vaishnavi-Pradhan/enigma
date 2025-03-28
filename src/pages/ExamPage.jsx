@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MainLayout from '../components/layout/MainLayout';
 import FaceDetection from '../components/camera/FaceDetection';
 import Questions from '../components/camera/Questions';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const ExamPage = () => {
   const [gazeStatus, setGazeStatus] = useState('Analyzing...');
   const [answers, setAnswers] = useState({});
+  const userId = sessionStorage.getItem('userId');
+  const [user, setUser]= useState(null);
+  const navigation = useNavigate();
+
+  
 
   const handleAnswerSelect = (questionId, answer) => {
     setAnswers(prev => ({ ...prev, [questionId]: answer }));
@@ -16,6 +22,30 @@ const ExamPage = () => {
     alert('Exam submitted successfully!');
     window.location.href = '/dashboard';
   };
+
+  useEffect(() => {
+      const fetchUser = async () => {
+        if (userId) {
+          const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
+  
+          if (data) {
+            setUser({ username: data.username, name: data.name });
+          } else {
+            console.error('Error fetching user data:', error);
+            navigation('/login');
+          }
+        } else {
+          navigation('/login');
+        }
+      };
+  
+      fetchUser();
+    }, [navigation, userId]);
+  
 
   return (
     <MainLayout>
