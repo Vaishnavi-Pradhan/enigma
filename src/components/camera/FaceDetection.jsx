@@ -65,7 +65,7 @@ const FaceDetection = ({ onGazeChange }) => {
               lastBlinkTime = Date.now(); // Update last blink time
             }
 
-            if (Date.now() - lastBlinkTime > 12000) { // If no blink detected for 12 seconds
+            if (Date.now() - lastBlinkTime > 20000) { // If no blink detected for 12 seconds
               console.error('No blinking detected - possible photo! Test will terminate.');
               onGazeChange('Possible Photo Detected');
               setTimeout(() => {

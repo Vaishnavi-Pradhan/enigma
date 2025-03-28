@@ -292,12 +292,17 @@ const LoginForm = () => {
 
       const currentEmbedding = response.data.embedding; // Receive embedding from backend
 
+      console.log("Embeddings in database:", userEmbedding);
+      console.log("Current face embeddings:", currentEmbedding);
+
       // Compare embeddings
       const similarity = cosineSimilarity(userEmbedding, currentEmbedding);
       console.log("Similarity Score:", similarity);
 
-      if (similarity >= 0.8) {
-        window.location.href = '/exam';
+      if (similarity >= 0.94) {
+        setTimeout(() => {
+          window.location.href = '/exam';
+        }, 10000); // 10-second delay
       } else {
         alert('Face authentication failed. Please try again.');
       }
