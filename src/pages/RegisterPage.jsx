@@ -1,10 +1,11 @@
-//new for face embeddings
+//new bcrypt
 import { useState, useRef } from 'react';
 import { supabase } from '../services/supabase';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
 import axios from 'axios';
+import bcrypt from 'bcryptjs';
 
 const RegisterContainer = styled.div`
   background: ${({ theme }) => theme.cardBg};
@@ -130,11 +131,15 @@ const Register = () => {
 
       const embedding = response.data.embedding; // Receive embedding from backend
 
+      // Hash the password using bcryptjs
+      const salt = bcrypt.genSaltSync(10);
+      const hashedPassword = bcrypt.hashSync(password, salt);
+
       // Save user details and embedding in Supabase
       const { error: supabaseError } = await supabase.from("users").insert({
         username: email,
         name: name,
-        password: password,
+        password: hashedPassword,
         embedding: embedding
       });
       if (supabaseError) throw new Error(supabaseError.message);
@@ -167,7 +172,7 @@ const Register = () => {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Email"
+            placeholder="Name"
             required
           />
         </FormGroup>
@@ -183,7 +188,7 @@ const Register = () => {
         </FormGroup>
         {/* Webcam Preview */}
         <FormGroup>
-          <Webcam ref={webcamRef} screenshotFormat="image/jpeg" width={330} height={300}/>
+          <Webcam ref={webcamRef} screenshotFormat="image/jpeg" width={330} height={300} />
         </FormGroup>
         <SubmitButton type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}

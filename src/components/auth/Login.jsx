@@ -1,8 +1,9 @@
-//no face detection
+//new bcrypt
 import styled, { keyframes } from 'styled-components';
 import { useState, useContext } from 'react';
 import { ThemeContext } from '../../context/ThemeContext';
 import { supabase } from '../../services/supabase';
+import bcrypt from 'bcryptjs';
 
 const fadeIn = keyframes`
   from { opacity: 0; transform: translateY(20px); }
@@ -94,24 +95,33 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
+      // Fetch the user record by email (username)
       const { data, error } = await supabase
         .from('users')
-        .select('id')
+        .select('id, password')
         .eq('username', email)
-        .eq('password', password)
         .single();
 
-      if (error) throw error;
-      if (!data || data.length === 0) {
+      if (error || !data) {
         alert('Invalid email or password');
         return;
       }
 
+      // Cross-check provided password with the stored hashed password
+      const passwordMatch = bcrypt.compareSync(password, data.password);
+      if (!passwordMatch) {
+        alert('Invalid email or password');
+        return;
+      }
+
+      // Successful login, store user id and redirect to dashboard
       const userId = data.id;
       sessionStorage.setItem('userId', userId);
       window.location.href = '/dashboard';
     } catch (error) {
-      alert(error.message);
+      alert('Login failed. Please check your credentials and try again.');
+      console.log(error.message);
+      console.log('Login error:', error);
     } finally {
       setLoading(false);
     }
