@@ -953,6 +953,7 @@ const LogoutButton = styled.button`
 
 const Dashboard = () => {
   const [user, setUser ] = useState(null);
+  //const [name, setName ] = useState(null);
   const navigate = useNavigate();
   const userId = sessionStorage.getItem('userId');
 
@@ -961,12 +962,13 @@ const Dashboard = () => {
       if (userId) {
         const { data, error } = await supabase
           .from('users')
-          .select('username')
+          .select('*')
           .eq('id', userId)
           .single();
 
         if (data) {
-          setUser ({ username: data.username });
+          setUser ({ username: data.username, name: data.name });
+          //setName({name: data.name});
         } else {
           console.error('Error fetching user data:', error);
           navigate('/login');
@@ -1000,7 +1002,8 @@ const Dashboard = () => {
       <ProfileSection>
         <ProfilePhoto src={ProfilePic} alt="Profile" />
         <ProfileInfo>
-          <h2><FaUser  /> {user.username}</h2>
+          <h2>Hello {user.name}</h2>
+          <h4><FaUser  />Email: {user.username}</h4>
         </ProfileInfo>
       </ProfileSection>
       <TestCardsContainer>

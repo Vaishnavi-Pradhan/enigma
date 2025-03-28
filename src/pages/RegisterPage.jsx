@@ -59,7 +59,7 @@ const Input = styled.input`
 const SubmitButton = styled.button`
   width: 100%;
   padding: 0.8rem;
-  background: ${({ theme }) => theme.primary};
+  background: blue;
   color: white;
   border: none;
   border-radius: 8px;
@@ -102,6 +102,7 @@ const AuthLink = styled.p`
 
 const Register = () => {
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -132,6 +133,7 @@ const Register = () => {
       // Save user details and embedding in Supabase
       const { error: supabaseError } = await supabase.from("users").insert({
         username: email,
+        name: name,
         password: password,
         embedding: embedding
       });
@@ -153,9 +155,18 @@ const Register = () => {
       <form onSubmit={handleRegister}>
         <FormGroup>
           <Input
-            //type="email"
+            type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+          />
+        </FormGroup>
+        <FormGroup>
+          <Input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             placeholder="Email"
             required
           />
@@ -172,7 +183,7 @@ const Register = () => {
         </FormGroup>
         {/* Webcam Preview */}
         <FormGroup>
-          <Webcam ref={webcamRef} screenshotFormat="image/jpeg" />
+          <Webcam ref={webcamRef} screenshotFormat="image/jpeg" width={330} height={300}/>
         </FormGroup>
         <SubmitButton type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}

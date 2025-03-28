@@ -14,6 +14,7 @@ const ExamPage = () => {
   const submitAnswers = () => {
     console.log('Submitted answers:', answers);
     alert('Exam submitted successfully!');
+    window.location.href = '/dashboard';
   };
 
   return (
