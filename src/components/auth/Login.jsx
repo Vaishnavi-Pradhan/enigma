@@ -98,7 +98,7 @@ const LoginForm = () => {
       // Fetch the user record by email (username)
       const { data, error } = await supabase
         .from('users')
-        .select('id, password')
+        .select('id, password','embedding')
         .eq('username', email)
         .single();
 
@@ -116,7 +116,9 @@ const LoginForm = () => {
 
       // Successful login, store user id and redirect to dashboard
       const userId = data.id;
+      const userEmbedding = data.embedding;
       sessionStorage.setItem('userId', userId);
+      sessionStorage.setItem('userEmbedding', userEmbedding);
       window.location.href = '/dashboard';
     } catch (error) {
       alert('Login failed. Please check your credentials and try again.');
